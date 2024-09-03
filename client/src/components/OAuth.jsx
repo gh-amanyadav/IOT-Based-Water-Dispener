@@ -30,12 +30,6 @@ const OAuth = () => {
 
   return (
     <div className='flex justify-between items-center mt-4'>
-      <div>
-        {/* OAuth specific content if needed */}
-      </div>
-      {/* <button type='button' onClick={handleSignIn} className='bg-red-700 p-3 rounded-lg text-white uppercase hover:opacity-95 disabled:opacity-80'>
-        Sign In with OAuth
-      </button> */}
     </div>
   );
 };

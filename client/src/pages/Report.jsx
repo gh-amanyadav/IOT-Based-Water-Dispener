@@ -1,12 +1,31 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { signOut } from '../redux/user/userSlice';
+import UserInfo from './UserInfo';
+import YearlyReport from './Live_data';
+import TotalReport from './Consumption';
+import Profile from './Profile';
 
 function Report() {
-  const [activeMenu, setActiveMenu] = useState('ReportMenu');
-  const [location, setLocation] = useState('');
-  const [deviceID, setDeviceID] = useState('');
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [activeMenu, setActiveMenu] = useState('UserInfo');
+
+  const handleSignOut = async () => {
+    try {
+      await fetch(`/api/auth/signout`);
+      dispatch(signOut());
+      navigate('/');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleButtonClick = (menu) => {
+    setActiveMenu(menu);
+    console.log(`Active Menu: ${menu}`); // Debug log
+  };
 
   const styles = {
     container: {
@@ -15,174 +34,140 @@ function Report() {
       height: '100vh',
       margin: 0,
       padding: 0,
+      fontFamily: 'Arial, sans-serif',
     },
     header: {
-      backgroundColor: '#007bff',
+      backgroundColor: '#002b36',
       height: '60px',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
+      position: 'sticky',
+      top: 0,
+      zIndex: 1000,
+      color: 'white',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
     },
     sidebar: {
-      backgroundColor: '#f8f9fa',
+      backgroundColor: '#ffffff',
       height: 'calc(100vh - 60px)',
       padding: '1rem',
       display: 'flex',
       flexDirection: 'column',
+      position: 'sticky',
+      top: '60px',
+      boxShadow: '2px 0 4px rgba(0, 0, 0, 0.1)',
     },
     content: {
       display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
       height: 'calc(100vh - 60px)',
       padding: '20px',
       flex: 1,
+      overflowY: 'auto',
+      backgroundColor: '#f4f4f4',
     },
     button: {
       width: '100%',
       padding: '15px 0',
-      marginBottom: '0.5rem',
-      backgroundColor: '#6c757d',
-      color: 'white',
-      fontSize: '1.2rem',
+      marginBottom: '1rem',
+      backgroundColor: '#007bff',
       border: 'none',
+      borderRadius: '6px',
       cursor: 'pointer',
+      transition: 'background-color 0.3s, transform 0.2s',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+      color: 'white',
+      position: 'relative',
+    },
+    buttonHover: {
+      backgroundColor: '#0056b3',
+      transform: 'scale(1.02)',
     },
     buttonActive: {
-      backgroundColor: '#343a40',
+      backgroundColor: '#004080',
     },
-    formControl: {
-      width: '200px',
-      margin: '0 auto',
-      fontSize: '1.2rem',
-      padding: '10px',
-      border: '1px solid #ccc',
-    },
-    section: {
-      display: 'flex',
-      justifyContent: 'space-around',
-      alignItems: 'flex-start',
-      height: '100%',
-      paddingTop: '3rem',
-    },
-    textCenter: {
-      textAlign: 'center',
-      padding: '1rem',
-    },
-    heading: {
-      fontSize: '1.5rem',
-      marginBottom: '1rem',
-    },
-    buttonPrimary: {
-      backgroundColor: '#007bff',
-      borderColor: '#007bff',
-      color: 'white',
-      marginTop: '0.5rem',
-      fontSize: '1.2rem',
-      padding: '10px 20px',
+    signOutButton: {
+      width: '100%',
+      padding: '15px 0',
+      backgroundColor: '#dc3545',
       border: 'none',
-      width: '200px',
+      borderRadius: '6px',
       cursor: 'pointer',
+      color: 'white',
+      transition: 'background-color 0.3s, transform 0.2s',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     },
-    inputButtonWrapper: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      marginBottom: '1rem', // Add margin bottom for spacing
+    signOutButtonHover: {
+      backgroundColor: '#c82333',
+      transform: 'scale(1.02)',
     },
-  };
-
-  const handleLocationSubmit = async () => {
-    try {
-      const response = await axios.post('/api/location', { location });
-      console.log(response.data);
-      alert('Location submitted successfully');
-    } catch (error) {
-      console.error('Error submitting location:', error);
-      alert('Failed to submit location');
-    }
-  };
-
-  const handleDeviceIdSubmit = async () => {
-    try {
-      const response = await axios.post('/api/device', { deviceID });
-      console.log(response.data);
-      alert('Device ID submitted successfully');
-    } catch (error) {
-      console.error('Error submitting device ID:', error);
-      alert('Failed to submit device ID');
-    }
   };
 
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={{ color: 'white', fontSize: '24px' }}><b>REPORT</b></h1>
+        <h1 style={{ color: 'white', fontSize: '24px' }}><b>DASHBOARD</b></h1>
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', flex: 1 }}>
         <div style={{ ...styles.sidebar, width: '200px' }}>
           <button
             style={{
               ...styles.button,
-              ...(activeMenu === 'SearchByScreen' ? styles.buttonActive : {}),
+              ...(activeMenu === 'Profile' ? styles.buttonActive : {}),
             }}
-            onClick={() => setActiveMenu('SearchByScreen')}
+            onClick={() => handleButtonClick('Profile')}
+            className="sidebar-button"
           >
-            Search By Screen
+            Profile
           </button>
           <button
             style={{
               ...styles.button,
-              ...(activeMenu === 'ReportMenu' ? styles.buttonActive : {}),
+              ...(activeMenu === 'UserInfo' ? styles.buttonActive : {}),
             }}
-            onClick={() => setActiveMenu('ReportMenu')}
+            onClick={() => handleButtonClick('UserInfo')}
+            className="sidebar-button"
           >
-            Report Menu
+            User Info
+          </button>
+          <button
+            style={{
+              ...styles.button,
+              ...(activeMenu === 'ConsumptionAnalysis' ? styles.buttonActive : {}),
+            }}
+            onClick={() => handleButtonClick('ConsumptionAnalysis')}
+            className="sidebar-button"
+          >
+            Consumption Analysis
+          </button>
+          <button
+            style={{
+              ...styles.button,
+              ...(activeMenu === 'LiveMenu' ? styles.buttonActive : {}),
+            }}
+            onClick={() => handleButtonClick('LiveMenu')}
+            className="sidebar-button"
+          >
+            Live Menu
+          </button>
+          <button
+            style={{
+              ...styles.signOutButton,
+            }}
+            onClick={handleSignOut}
+            className="signout-button"
+          >
+            Sign Out
           </button>
         </div>
-        <div style={{ ...styles.content, flex: 1 }}>
-          {activeMenu === 'ReportMenu' && (
-            <div style={styles.section}>
-              <div style={styles.textCenter}>
-                <h4 style={styles.heading}><b>YEARLY</b></h4>
-                <button style={styles.buttonPrimary} onClick={() => navigate('/yearly')}>View</button>
-              </div>
-              <div style={styles.textCenter}>
-                <h4 style={styles.heading}><b>MONTHLY</b></h4>
-                <button style={styles.buttonPrimary} onClick={() => navigate('/monthly')}>View</button>
-              </div>
-              <div style={styles.textCenter}>
-                <h4 style={styles.heading}><b>WEEKLY</b></h4>
-                <button style={styles.buttonPrimary} onClick={() => navigate('/weekly')}>View</button>
-              </div>
-            </div>
-          )}
-          {activeMenu === 'SearchByScreen' && (
-            <div style={styles.section}>
-              <div style={styles.inputButtonWrapper}>
-                <h4 style={styles.heading}><b>LOCATION</b></h4>
-                <input
-                  type="text"
-                  placeholder="Enter Location"
-                  style={styles.formControl}
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                />
-                <button style={styles.buttonPrimary} onClick={handleLocationSubmit}>Send</button>
-              </div>
-              <div style={styles.inputButtonWrapper}>
-                <h4 style={styles.heading}><b>DEVICE ID</b></h4>
-                <input
-                  type="text"
-                  placeholder="Enter Device ID"
-                  style={styles.formControl}
-                  value={deviceID}
-                  onChange={(e) => setDeviceID(e.target.value)}
-                />
-                <button style={styles.buttonPrimary} onClick={handleDeviceIdSubmit}>Send</button>
-              </div>
-            </div>
-          )}
+
+        <div style={styles.content}>
+          {activeMenu === 'LiveMenu' && <YearlyReport />}
+          {activeMenu === 'UserInfo' && <UserInfo />}
+          {activeMenu === 'ConsumptionAnalysis' && <TotalReport />}
+          {activeMenu === 'Profile' && <Profile />}
         </div>
       </div>
     </div>

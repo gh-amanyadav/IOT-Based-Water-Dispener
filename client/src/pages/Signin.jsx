@@ -1,15 +1,13 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice';
-import { useDispatch, useSelector } from 'react-redux';
 import OAuth from '../components/OAuth';
 
 const SignIn = () => {
   const [formData, setFormData] = useState({});
-  const { loading, error } = useSelector((state) => state.user);
+  const [isForgotPasswordHovered, setIsForgotPasswordHovered] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -18,7 +16,7 @@ const SignIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      dispatch(signInStart());
+      setLoading(true);
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
         headers: {
@@ -27,39 +25,158 @@ const SignIn = () => {
         body: JSON.stringify(formData)
       });
       const data = await res.json();
+	console.log('signin Data: ', data);
+      setLoading(false);
       if (data.success === false) {
-        dispatch(signInFailure(data));
+        setError(data.message || 'Something went wrong!');
         return;
       }
-      dispatch(signInSuccess(data));
       navigate('/Report');
     } catch (error) {
-      dispatch(signInFailure(error));
+      setLoading(false);
+      setError('Something went wrong!');
+    }
+  };
+
+  const navigateToOtp = () => {
+    if (formData.email) {
+      // Logic for OTP navigation (assuming you have defined it elsewhere)
+    } else {
+      alert("Please enter your email");
     }
   };
 
   return (
-    <div className='bg-[#1C1C1C] p-8 h- min-h-screen flex justify-center items-center'>
-      <div className='p-3 max-w-lg w-full bg-white rounded-2xl'>
-        <h1 className='text-3xl text-center font-semibold my-7'>Sign In</h1>
-        <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
-          <input onChange={handleChange} type="email" placeholder='Email' id='email' className='bg-slate-100 p-3 rounded-lg' />
-          <input onChange={handleChange} type="password" placeholder='Password' id='password' className='bg-slate-100 p-3 rounded-lg' />
-          <button className='bg-slate-700 p-3 rounded-lg text-white uppercase hover:opacity-95' disabled={loading}>
-            {loading ? 'Loading...' : 'Sign In'}
+    <div style={styles.container}>
+      <div style={styles.form}>
+        <div style={styles.header}>
+          <h1 style={styles.headerText}>LOGIN</h1>
+        </div>
+        <form style={styles.formFields} onSubmit={handleSubmit}>
+          <input
+            onChange={handleChange}
+            type="email"
+            placeholder='Email'
+            id='email'
+            style={styles.input}
+          />
+          <input
+            onChange={handleChange}
+            type="password"
+            placeholder='Password'
+            id='password'
+            style={styles.input}
+          />
+          <button
+            type="submit"
+            style={styles.button}
+            disabled={loading}
+          >
+            {loading ? 'Loading...' : 'Login'}
           </button>
-          <div className='flex justify-between items-center mt-4'>
-            <div>
-              <p>Don't have an account?</p>
-              <Link to="/signup" className='text-blue-500'>Sign up</Link>
-            </div>
+          <button
+            type="button"
+            style={{ ...styles.forgotButton, ...(isForgotPasswordHovered ? styles.forgotButtonHover : {}) }}
+            onClick={navigateToOtp}
+            onMouseEnter={() => setIsForgotPasswordHovered(true)}
+            onMouseLeave={() => setIsForgotPasswordHovered(false)}
+          >
+            Forgot Password?
+          </button>
+          <div style={styles.footer}>
+            <p>Don't have an account?</p>
+            <Link to="/signup" style={styles.link}>Sign up</Link>
           </div>
         </form>
         <OAuth />
-        <p className='text-red-700 mt-5'>{error ? error.message || 'Something went wrong!' : ''}</p>
+        {error && <p style={styles.error}>{error}</p>}
       </div>
     </div>
   );
 };
+
+const styles = {
+  container: {
+    backgroundColor: '#f5f5f5',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    padding: '1rem'
+  },
+  form: {
+    background: '#ffffff',
+    borderRadius: '8px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    maxWidth: '400px',
+    width: '100%',
+    padding: '2rem',
+    margin: '1.5rem 0' // Added margin to create space between form container and other elements
+  },
+  header: {
+    backgroundColor: '#007BFF',
+    padding: '1rem',
+    borderRadius: '8px 8px 0 0',
+    textAlign: 'center',
+    marginBottom: '1rem' // Added margin to create space between the header and the input fields
+  },
+  headerText: {
+    color: '#ffffff',
+    margin: 0,
+    fontSize: '2rem'
+  },
+  formFields: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem'
+  },
+  input: {
+    background: '#f5f5f5',
+    border: '1px solid #ddd',
+    padding: '0.75rem',
+    borderRadius: '4px'
+  },
+  button: {
+    background: '#007BFF',
+    color: '#fff',
+    padding: '0.75rem',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  forgotButton: {
+    background: '#007BFF',
+    color: '#fff',
+    padding: '0.75rem',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: '1rem',
+    transition: 'background-color 0.3s ease'
+  },
+  forgotButtonHover: {
+    background: '#0056b3'
+  },
+  footer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: '1.5rem'
+  },
+  link: {
+    color: '#007BFF',
+    textDecoration: 'none'
+  },
+  error: {
+    color: '#f00',
+    marginTop: '1rem',
+    textAlign: 'center'
+  }
+};
+
 
 export default SignIn;

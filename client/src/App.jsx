@@ -5,9 +5,8 @@ import Profile from './pages/Profile'
 import Signin from './pages/Signin'
 import SignUp from './pages/SignUp'
 import Report from './pages/Report'
-import Weekly from './pages/Weekly'
-import Monthly from './pages/Monthly'
-import Yearly from './pages/Yearly'
+import Live_data from './pages/Live_data'
+import Consumption from './pages/Consumption'
 import Header from './components/Header'
 import PrivateRoute from './components/PrivateRoute'
 
@@ -20,9 +19,8 @@ function App() {
         <Route path='/signin' Component={Signin} />
         <Route path='/signup' Component={SignUp} />
         <Route path='/report' Component={Report} />
-        <Route path='/weekly' Component={Weekly} />
-        <Route path='/monthly' Component={Monthly} />
-        <Route path='/yearly' Component={Yearly} />
+	<Route path='/consumption' Component={Consumption} />
+        <Route path='/Live_data' Component={Live_data} />
         <Route element={<PrivateRoute/>}>
           <Route path='/profile' element={<Profile/>} />
         </Route>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/axios';
 import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import moment from 'moment-timezone';
 import styled from 'styled-components';
@@ -196,7 +196,7 @@ const Consumption = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get('https://iotdevice.apdp.co.in/api/reports/');
+                const response = await api.get('/reports');
                 const aggregatedData = response.data.reduce((acc, item) => {
                     const { deviceId, handWash500, handWash250, bodyWash500, bodyWash250, shampoo500, shampoo250, datetime } = item;
 
@@ -383,7 +383,7 @@ const Consumption = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {(filteredData.length > 0 ? filteredData : tableData).map((item, index) => (
+                        {searchQuery && (filteredData.length > 0 ? filteredData : tableData).map((item, index) => (
                             <tr key={index}>
                                 <Td>{item.deviceId}</Td>
                                 <Td>{item.datetime}</Td>

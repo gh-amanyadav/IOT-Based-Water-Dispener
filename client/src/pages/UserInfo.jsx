@@ -17,18 +17,16 @@ const getTokenFromCookies = () => {
 
 const TableContainer = styled.div`
   width: 100%;
-  height: calc(100vh - 200px);
+  height: calc(100vh - 250px);
   overflow-x: auto;
   overflow-y: auto;
   border-radius: 8px;
   background-color: #ffffff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-top: 10px;
   -webkit-overflow-scrolling: touch;
 
   @media (max-width: 768px) {
-    height: calc(100vh - 250px);
-    margin: 5px;
+    height: calc(100vh - 300px);
   }
 `;
 
@@ -84,12 +82,202 @@ const TableRow = styled.tr`
   }
 `;
 
+const Button = styled.button`
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin: 5px;
+  
+  @media (max-width: 768px) {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+`;
+
+const CreateUserButton = styled(Button)`
+  background-color: #28a745;
+  color: white;
+  
+  &:hover {
+    background-color: #218838;
+  }
+`;
+
+const CancelButton = styled(Button)`
+  background-color: #dc3545;
+  color: white;
+  
+  &:hover {
+    background-color: #c82333;
+  }
+`;
+
+const SaveButton = styled(Button)`
+  background-color: #28a745;
+  color: white;
+  
+  &:hover {
+    background-color: #218838;
+  }
+`;
+
+const BackButton = styled(Button)`
+  background-color: #6c757d;
+  color: white;
+  
+  &:hover {
+    background-color: #5a6268;
+  }
+`;
+
+const FormContainer = styled.div`
+  width: 100%;
+  height: calc(100vh - 250px);
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  overflow-y: auto;
+
+  @media (max-width: 768px) {
+    height: calc(100vh - 300px);
+    padding: 15px;
+  }
+`;
+
+const FormSection = styled.div`
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e5e5e5;
+`;
+
+const FormTitle = styled.h3`
+  margin-bottom: 15px;
+  color: #007bff;
+  font-size: 18px;
+`;
+
+const FormRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 10px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 10px;
+  }
+`;
+
+const FormGroup = styled.div`
+  flex: 1;
+  min-width: 200px;
+`;
+
+const Label = styled.label`
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  
+  &:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+  }
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+`;
+
+const TopBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 10px;
+`;
+
+const SearchBox = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  max-width: 400px;
+  z-index: 100;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+
+  @media (max-width: 768px) {
+    padding: 8px;
+    max-width: 250px;
+  }
+`;
+
+const SearchInput = styled.input`
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  outline: none;
+  transition: border-color 0.3s;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    padding: 8px;
+    font-size: 14px;
+  }
+`;
+
+const ErrorMessage = styled.div`
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 10px 0;
+`;
+
+const SuccessMessage = styled.div`
+  color: #28a745;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 10px 0;
+`;
+
 const UserInfo = () => {
   const [tableData, setTableData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [statusMessage, setStatusMessage] = useState({ type: '', message: '' });
+  const [newUser, setNewUser] = useState({
+    username: '',
+    location: '',
+    deviceId: '',
+    phoneNo: '',
+    datetime: new Date()
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -148,64 +336,111 @@ const UserInfo = () => {
     setSearchQuery(e.target.value);
   };
 
-  const styles = {
-    searchSection: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      width: '100%',
-      height: '100%',
-      position: 'relative',
-      marginBottom: '10px',
-      overflow: 'hidden',
-    },
-    searchBox: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: '100%',
-      maxWidth: '400px',
-      zIndex: 100,
-      backgroundColor: '#ffffff',
-      borderRadius: '8px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      padding: '10px',
-      marginBottom: '10px',
+  const handleCreateUserClick = () => {
+    setIsCreatingUser(true);
+    setStatusMessage({ type: '', message: '' });
+  };
 
-      '@media (max-width: 768px)': {
-        padding: '8px',
-        marginBottom: '5px',
-      }
-    },
-    searchInput: {
-      width: '100%',
-      padding: '10px',
-      fontSize: '16px',
-      borderRadius: '6px',
-      border: '1px solid #ced4da',
-      outline: 'none',
-      transition: 'border-color 0.3s',
-      textAlign: 'center',
+  const handleCancelCreate = () => {
+    setIsCreatingUser(false);
+    setNewUser({
+      username: '',
+      location: '',
+      deviceId: '',
+      phoneNo: '',
+      datetime: new Date()
+    });
+  };
 
-      '@media (max-width: 768px)': {
-        padding: '8px',
-        fontSize: '14px',
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewUser(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleCreateUser = async () => {
+    try {
+      setLoading(true);
+      setStatusMessage({ type: '', message: '' });
+      
+      // Check if any required field is empty
+      if (!newUser.username || !newUser.location || !newUser.deviceId || !newUser.phoneNo) {
+        setStatusMessage({ type: 'error', message: 'All fields are required' });
+        setLoading(false);
+        return;
       }
+      
+      // Construct query params directly - avoid any automatic JSON stringification
+      // The API expects: data=location,username,deviceId,phoneNo
+      const location = encodeURIComponent(newUser.location);
+      const username = encodeURIComponent(newUser.username);
+      const deviceId = encodeURIComponent(newUser.deviceId);
+      const phoneNo = encodeURIComponent(newUser.phoneNo);
+      
+      // Build the URL manually to avoid any automatic processing
+      const url = `/records/record?data=${location},${username},${deviceId},${phoneNo}`;
+      
+      console.log("Sending request to:", url); // Log for debugging
+      
+      // Using the direct URL approach to avoid any data format transformation
+      const response = await api.get(url);
+      
+      if (response.data) {
+        // Fetch updated records after creating a new one
+        const updatedRecords = await api.get('/records');
+        setTableData(updatedRecords.data);
+        
+        setStatusMessage({ type: 'success', message: 'User record created successfully' });
+        
+        // Reset form and return to list after a short delay
+        setTimeout(() => {
+          setNewUser({
+            username: '',
+            location: '',
+            deviceId: '',
+            phoneNo: '',
+            datetime: new Date()
+          });
+          setIsCreatingUser(false);
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('Error creating user record:', error);
+      let errorMessage = 'Failed to create user record. Please try again.';
+      
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        errorMessage = error.response.data?.message || `Error: ${error.response.status}`;
+        console.error('Error response:', error.response.data);
+      } else if (error.request) {
+        // The request was made but no response was received
+        errorMessage = 'No response from server. Please check your network connection.';
+      }
+      
+      setStatusMessage({ type: 'error', message: errorMessage });
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
-    <div style={styles.searchSection}>
-      <div style={styles.searchBox}>
-        <input
-          type="text"
-          placeholder="Search"
-          style={styles.searchInput}
-          value={searchQuery}
-          onChange={handleSearch}
-        />
-      </div>
+  const renderUserTable = () => (
+    <>
+      <TopBar>
+        <SearchBox>
+          <SearchInput
+            type="text"
+            placeholder="Search"
+            value={searchQuery}
+            onChange={handleSearch}
+          />
+        </SearchBox>
+        <CreateUserButton onClick={handleCreateUserClick}>
+          Create User
+        </CreateUserButton>
+      </TopBar>
       
       {loading && <div style={{ textAlign: 'center', padding: '20px' }}>Loading data...</div>}
       
@@ -249,6 +484,91 @@ const UserInfo = () => {
           </tbody>
         </Table>
       </TableContainer>
+    </>
+  );
+
+  const renderCreateUserForm = () => (
+    <FormContainer>
+      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Create New User Record</h2>
+      
+      {statusMessage.type && (
+        statusMessage.type === 'error' 
+          ? <ErrorMessage>{statusMessage.message}</ErrorMessage>
+          : <SuccessMessage>{statusMessage.message}</SuccessMessage>
+      )}
+      
+      <FormSection>
+        <FormTitle>User Information</FormTitle>
+        <FormRow>
+          <FormGroup>
+            <Label>Username *</Label>
+            <Input 
+              type="text" 
+              name="username" 
+              value={newUser.username}
+              onChange={handleInputChange}
+              placeholder="Enter username"
+              required
+            />
+          </FormGroup>
+          <FormGroup>
+            <Label>Phone Number *</Label>
+            <Input 
+              type="text" 
+              name="phoneNo" 
+              value={newUser.phoneNo}
+              onChange={handleInputChange}
+              placeholder="Enter phone number"
+              required
+            />
+          </FormGroup>
+        </FormRow>
+      </FormSection>
+      
+      <FormSection>
+        <FormTitle>Device Information</FormTitle>
+        <FormRow>
+          <FormGroup>
+            <Label>Device ID *</Label>
+            <Input 
+              type="text" 
+              name="deviceId" 
+              value={newUser.deviceId}
+              onChange={handleInputChange}
+              placeholder="Enter device ID"
+              required
+            />
+          </FormGroup>
+          <FormGroup>
+            <Label>Location *</Label>
+            <Input 
+              type="text" 
+              name="location" 
+              value={newUser.location}
+              onChange={handleInputChange}
+              placeholder="Enter location"
+              required
+            />
+          </FormGroup>
+        </FormRow>
+      </FormSection>
+      
+      <p style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>* All fields are required</p>
+      
+      <ButtonGroup>
+        <CancelButton onClick={handleCancelCreate}>
+          Cancel
+        </CancelButton>
+        <SaveButton onClick={handleCreateUser} disabled={loading}>
+          {loading ? 'Creating...' : 'Create User Record'}
+        </SaveButton>
+      </ButtonGroup>
+    </FormContainer>
+  );
+
+  return (
+    <div style={{ width: '100%', height: '100%' }}>
+      {isCreatingUser ? renderCreateUserForm() : renderUserTable()}
     </div>
   );
 };

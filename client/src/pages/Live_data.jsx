@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/axios';
 import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import LoadingSpinner from '../components/LoadingSpinner';
 import styled from 'styled-components';
@@ -148,7 +148,7 @@ const Live_data = () => {
   useEffect(() => {
     // Fetch data from the API when the component mounts
     setLoading(true);
-    axios.get('https://iotdevice.apdp.co.in/api/reports')
+    api.get('/reports')
       .then(response => {
         const filtered = filterLastYearData(response.data);
         setTableData(filtered);

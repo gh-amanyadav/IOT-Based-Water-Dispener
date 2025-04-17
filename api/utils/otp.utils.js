@@ -21,10 +21,12 @@ const createTransporter = () => {
     }
 
     return nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.rediffmail.com', // Rediffmail SMTP host
+        port: 587,                  // Rediffmail SMTP port (TLS)
+        secure: false,              // Use TLS
         auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASSWORD
+            user: process.env.EMAIL_USER, // Your Rediffmail email
+            pass: process.env.EMAIL_PASSWORD // Your Rediffmail password
         }
     });
 };
@@ -63,8 +65,8 @@ export const sendOTPEmail = async (email, otp) => {
         // Provide more helpful error messages
         if (error.code === 'EAUTH') {
             console.error('Authentication failed. Please check your email credentials.');
-            console.error('For Gmail, you need to use an App Password if 2FA is enabled.');
-            console.error('See EMAIL_SETUP.md for instructions.');
+            // Removed Gmail-specific advice
+            console.error('Ensure EMAIL_USER and EMAIL_PASSWORD in .env are correct for Rediffmail.');
         }
         
         throw new Error('Failed to send OTP email');
